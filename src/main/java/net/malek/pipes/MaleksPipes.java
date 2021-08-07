@@ -12,6 +12,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +43,6 @@ public class MaleksPipes implements ModInitializer{
     public static final EnumProperty<SideType> SIDE_DOWN;
     public static final Set<EnumProperty<SideType>> SIDE_DIRECTIONS;
 
-    public static final int MAX_RECURSION_DEPTH = 3000;
     
     static {
         SIDE_NORTH = EnumProperty.of("side_north", SideType.class);
@@ -64,58 +64,19 @@ public class MaleksPipes implements ModInitializer{
         temp.add(SIDE_EAST);
         temp.add(SIDE_WEST);
     }
+    public static EnumProperty<SideType> getSideTypeFromDirection(Direction direction) {
+        return switch(direction) {
+            case UP -> SIDE_UP;
+            case DOWN -> SIDE_DOWN;
+            case EAST -> SIDE_EAST;
+            case WEST -> SIDE_WEST;
+            case NORTH -> SIDE_NORTH;
+            case SOUTH -> SIDE_SOUTH;
+        };
+    }
 
 
 
-    //Some Misc Methods
-    static Optional<BlockPos>[] getAroundTarget(World world, BlockPos pos, BiPredicate<World, BlockPos> predicate) {
-        Optional<BlockPos>[] positions = new Optional[6];
-        positions[0] = getIfMatches(world, pos.add(1, 0, 0), predicate);
-        positions[1] = getIfMatches(world, pos.add(0, 1, 0), predicate);
-        positions[2] = getIfMatches(world, pos.add(0, 0, 1), predicate);
-        positions[3] = getIfMatches(world, pos.add(-1, 0, 0), predicate);
-        positions[4] = getIfMatches(world, pos.add(0, -1, 0), predicate);
-        positions[5] = getIfMatches(world, pos.add(0, 0, -1), predicate);
-        return positions;
-    }
-    static Optional<BlockPos> getIfMatches(World world, BlockPos pos, BiPredicate<World, BlockPos> predicate) {
-        if (predicate.test(world, pos)) {
-            return Optional.of(pos);
-        }
-        return Optional.empty();
-    }
-    public static HashSet<BlockPos> findPath(World world,
-                                      BlockPos previousPos,
-                                      HashSet<BlockPos> paths,
-                                      HashSet<BlockPos> previousPositions,
-                                      BiConsumer<World, BlockPos> doAtEndPoint,
-                                      BiConsumer<World, BlockPos> doAtPipe,
-                                      BiPredicate<World, BlockPos> isPipe,
-                                      TriPredicate<World, BlockPos, BlockPos> isEndpoint,
-                                      int recursionDepth) {
-        Optional<BlockPos>[] optionals = getAroundTarget(world, previousPos, isPipe);
-        for (Optional<BlockPos> optional : optionals) {
-            if (optional.isPresent() && !previousPositions.contains(optional.get())) {
-                previousPositions.add(optional.get());
-                recursionDepth++;
-                //Prevents the recursive pipe algorthim from causing a stack overflow error if we go 3000 recursion too deep.
-                if (recursionDepth > MAX_RECURSION_DEPTH) {
-                    return paths;
-                }
-                BlockPos currentPos = optional.get();
-                if (isEndpoint.accept(world, currentPos, previousPos)) {
-                    System.out.println(world.getBlockState(currentPos));
-                    System.out.println(currentPos);
-                    doAtEndPoint.accept(world, currentPos);
-                    paths.add(currentPos);
-                } else if(isPipe.test(world, currentPos)) {
-                    doAtPipe.accept(world, currentPos);
-                    findPath(world, currentPos, paths, previousPositions, doAtEndPoint, doAtPipe, isPipe, isEndpoint, recursionDepth);
-                }
-            }
-        }
-        return paths;
-    }
     public static BlockEntityType<TestPipeBlockEntity> TEST_PIPE_BLOCK_ENTITY;
     public static String MOD_ID = "maleks_pipes";
     public static Block TEST_PIPE = new TestPipe(FabricBlockSettings.of(Material.STONE));
