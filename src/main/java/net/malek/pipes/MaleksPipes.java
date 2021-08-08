@@ -1,14 +1,16 @@
 package net.malek.pipes;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.malek.pipes.test.TestPipe;
-import net.malek.pipes.test.TestPipeBlockEntity;
+import net.malek.pipes.test.*;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -77,13 +79,41 @@ public class MaleksPipes implements ModInitializer{
 
 
 
-    public static BlockEntityType<TestPipeBlockEntity> TEST_PIPE_BLOCK_ENTITY;
+    public static BlockEntityType<TestConsumerBlockEntity> TEST_CONSUMER_BLOCK_ENTITY;
+    public static BlockEntityType<TestProducerBlockEntity> TEST_PRODUCER_BLOCK_ENTITY;
+
+    public static Block TEST_CONSUMER = new TestConsumer(FabricBlockSettings.of(Material.STONE));
+    public static Block TEST_PRODUCER = new TestProducer(FabricBlockSettings.of(Material.STONE));
+
     public static String MOD_ID = "maleks_pipes";
     public static Block TEST_PIPE = new TestPipe(FabricBlockSettings.of(Material.STONE));
+    public static PipeNetwork TEST_NETWORK;
     @Override
     public void onInitialize() {
-        TEST_PIPE_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier(MOD_ID, "test_pipe"), FabricBlockEntityTypeBuilder.create(TestPipeBlockEntity::new, TEST_PIPE).build(null));
-        TEST_PIPE = Registry.register(Registry.BLOCK, new Identifier(MOD_ID, "test_pipe"), TEST_PIPE);
+
+/*      TEST_PIPE = Registry.register(Registry.BLOCK, new Identifier(MOD_ID, "test_pipe"), TEST_PIPE);
+        TEST_CONSUMER = Registry.register(Registry.BLOCK, new Identifier(MOD_ID, "test_consumer"), TEST_CONSUMER);
+        TEST_PRODUCER = Registry.register(Registry.BLOCK, new Identifier(MOD_ID, "test_producer"), TEST_PRODUCER);
+
+        TEST_CONSUMER_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier(MOD_ID, "consumer"), FabricBlockEntityTypeBuilder.create(TestConsumerBlockEntity::new, TEST_CONSUMER).build(null));
+        TEST_PRODUCER_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier(MOD_ID, "producer"), FabricBlockEntityTypeBuilder.create(TestProducerBlockEntity::new, TEST_PRODUCER).build(null));
+
+        Registry.register(Registry.ITEM, new Identifier(MOD_ID, "test_pipe"), new BlockItem(TEST_PIPE, new FabricItemSettings().group(ItemGroup.MISC)));
+        Registry.register(Registry.ITEM, new Identifier(MOD_ID, "test_consumer"), new BlockItem(TEST_CONSUMER, new FabricItemSettings().group(ItemGroup.MISC)));
+        Registry.register(Registry.ITEM, new Identifier(MOD_ID, "test_producer"), new BlockItem(TEST_PRODUCER, new FabricItemSettings().group(ItemGroup.MISC)));
+
+        TEST_NETWORK = new PipeNetwork(this::testIsProducer, this::testIsConsumer, this::testIsPipe);*/
+
+    }
+
+    boolean testIsProducer(World world, BlockPos pos) {
+        return world.getBlockState(pos).getBlock() == TEST_PRODUCER;
+    }
+    boolean testIsConsumer(World world, BlockPos pos) {
+        return world.getBlockState(pos).getBlock() == TEST_CONSUMER;
+    }
+    boolean testIsPipe(World world, BlockPos pos) {
+        return world.getBlockState(pos).getBlock() == TEST_PIPE;
     }
 
 

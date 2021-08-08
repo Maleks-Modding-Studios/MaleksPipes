@@ -31,13 +31,13 @@ public class PipeNetwork {
         return isConsumer.test(world, pos) || isPipe.test(world, pos);
     }
 
-    public boolean isSideConsumer(World world, BlockPos previousPos, BlockPos currentPos) {
+    public boolean isSideConsumer(World world, BlockPos currentPos, BlockPos previousPos) {
         Direction direction = Direction.fromVector(previousPos.subtract(currentPos));
-        return world.getBlockState(currentPos).get(MaleksPipes.getSideTypeFromDirection(direction)).equals(SideType.CONSUMER);
+        return isConsumer.test(world, currentPos) && world.getBlockState(currentPos).get(MaleksPipes.getSideTypeFromDirection(direction)).equals(SideType.CONSUMER);
     }
-    public boolean isSideProducer(World world, BlockPos previousPos, BlockPos currentPos) {
+    public boolean isSideProducer(World world, BlockPos currentPos, BlockPos previousPos) {
         Direction direction = Direction.fromVector(previousPos.subtract(currentPos));
-        return world.getBlockState(currentPos).get(MaleksPipes.getSideTypeFromDirection(direction)).equals(SideType.PRODUCER);
+        return isProducer.test(world, currentPos) && world.getBlockState(currentPos).get(MaleksPipes.getSideTypeFromDirection(direction)).equals(SideType.PRODUCER);
     }
 
     //Some Misc Methods
@@ -68,6 +68,7 @@ public class PipeNetwork {
                                              int recursionDepth) {
         Optional<BlockPos>[] optionals = getAroundTarget(world, previousPos, isPipeOrEndpoint);
         for (Optional<BlockPos> optional : optionals) {
+            //Makes sure we don't go through with this test if we have already hit this position before
             if (optional.isPresent() && !previousPositions.contains(optional.get())) {
                 previousPositions.add(optional.get());
                 recursionDepth++;
