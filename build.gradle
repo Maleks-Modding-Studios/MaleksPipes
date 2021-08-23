@@ -17,6 +17,7 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
+	mavenCentral()
 }
 
 dependencies {
@@ -86,30 +87,30 @@ jar {
 //		// retrieving dependencies.
 //	}
 //}
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
-		}
-	}
-
-	repositories {
-		maven {
-			name = "GitHubPackages"
-			url = "https://maven.pkg.github.com/Maleks-Modding-Studios/MaleksPipes"
-
-			// Set credentials in "C:\Users\*\.gradle\gradle.properties"
-			// Username being your github username, and password being a generated token with required perms.
-			credentials {
-				username = project.username
-				password = project.password
-			}
-		}
-	}
-}
+//publishing {
+//	publications {
+//		mavenJava(MavenPublication) {
+//			// add all the jars that should be included when publishing to maven
+//			artifact(remapJar) {
+//				builtBy remapJar
+//			}
+//			artifact(sourcesJar) {
+//				builtBy remapSourcesJar
+//			}
+//		}
+//	}
+//
+//	repositories {
+//		maven {
+//			name = "GitHubPackages"
+//			url = "https://maven.pkg.github.com/Maleks-Modding-Studios/MaleksPipes"
+//
+//			// Set credentials in "C:\Users\*\.gradle\gradle.properties"
+//			// Username being your github username, and password being a generated token with required perms.
+//			credentials {
+//				username = project.username
+//				password = project.password
+//			}
+//		}
+//	}
+//}
